@@ -615,7 +615,10 @@ class _ShadAppState extends State<ShadApp> {
               actions: widget.actions,
               restorationScopeId: widget.restorationScopeId,
               localizationsDelegates: effectiveLocalizationsDelegates,
-              textStyle: TextStyle(color: theme.colorScheme.foreground),
+              textStyle: TextStyle(
+                color: theme.colorScheme.foreground,
+                fontFamily: theme.textTheme.family,
+              ),
             ),
           );
         }
@@ -648,7 +651,10 @@ class _ShadAppState extends State<ShadApp> {
             actions: widget.actions,
             restorationScopeId: widget.restorationScopeId,
             localizationsDelegates: effectiveLocalizationsDelegates,
-            textStyle: TextStyle(color: theme.colorScheme.foreground),
+            textStyle: TextStyle(
+              color: theme.colorScheme.foreground,
+              fontFamily: theme.textTheme.family,
+            ),
             pageRouteBuilder:
                 widget.pageRouteBuilder ??
                 <T>(RouteSettings settings, WidgetBuilder builder) {

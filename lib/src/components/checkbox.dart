@@ -253,15 +253,76 @@ class _ShadCheckboxState extends State<ShadCheckbox> {
       ),
     );
 
-    final defaultCrossAxisAlignment =
-        widget.label != null && widget.sublabel != null
-        ? CrossAxisAlignment.start
-        : CrossAxisAlignment.center;
-
+    // The control is centered against the primary label line; the sublabel
+    // (when present) sits below it, so the default is always center.
     final effectiveCrossAxisAlignment =
         widget.crossAxisAlignment ??
         theme.checkboxTheme.crossAxisAlignment ??
-        defaultCrossAxisAlignment;
+        CrossAxisAlignment.center;
+
+    final labelRow = Row(
+      textDirection: widget.direction,
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: effectiveCrossAxisAlignment,
+      children: [
+        Padding(
+          padding: effectiveCheckboxPadding,
+          child: checkbox,
+        ),
+        if (widget.label != null)
+          Flexible(
+            child: Padding(
+              padding: effectivePadding,
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: DefaultTextStyle(
+                  style: theme.textTheme.muted.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: theme.colorScheme.foreground,
+                  ),
+                  child: widget.label!,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+
+    final Widget content;
+    if (widget.sublabel == null) {
+      content = labelRow;
+    } else {
+      content = Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          labelRow,
+          // Sublabel sits under the label, not the control: a SizedBox reserves
+          // the control's width so it aligns with the label start.
+          Row(
+            textDirection: widget.direction,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(width: effectiveSize),
+              Flexible(
+                child: Padding(
+                  padding: effectivePadding,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: DefaultTextStyle(
+                      style: theme.textTheme.muted.fallback(
+                        color: theme.colorScheme.mutedForeground,
+                      ),
+                      child: widget.sublabel!,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    }
 
     return ShadDisabled(
       showForbiddenCursor: true,
@@ -269,50 +330,7 @@ class _ShadCheckboxState extends State<ShadCheckbox> {
       disabledOpacity: 1,
       child: GestureDetector(
         onTap: widget.onChanged == null ? null : onTap,
-        child: Row(
-          textDirection: widget.direction,
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: effectiveCrossAxisAlignment,
-          children: [
-            Padding(
-              padding: effectiveCheckboxPadding,
-              child: checkbox,
-            ),
-            if (widget.label != null || widget.sublabel != null)
-              Flexible(
-                child: Padding(
-                  padding: effectivePadding,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (widget.label != null)
-                        MouseRegion(
-                          cursor: SystemMouseCursors.click,
-                          child: DefaultTextStyle(
-                            style: theme.textTheme.muted.copyWith(
-                              fontWeight: FontWeight.w500,
-                              color: theme.colorScheme.foreground,
-                            ),
-                            child: widget.label!,
-                          ),
-                        ),
-                      if (widget.sublabel != null)
-                        MouseRegion(
-                          cursor: SystemMouseCursors.click,
-                          child: DefaultTextStyle(
-                            style: theme.textTheme.muted.fallback(
-                              color: theme.colorScheme.mutedForeground,
-                            ),
-                            child: widget.sublabel!,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        ),
+        child: content,
       ),
     );
   }

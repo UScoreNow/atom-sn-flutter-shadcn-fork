@@ -6,6 +6,7 @@ import 'package:shadcn_ui/src/raw_components/focusable.dart';
 import 'package:shadcn_ui/src/theme/components/decorator.dart';
 import 'package:shadcn_ui/src/theme/theme.dart';
 import 'package:shadcn_ui/src/utils/debug_check.dart';
+import 'package:shadcn_ui/src/utils/extensions/text_style.dart';
 import 'package:shadcn_ui/src/utils/provider.dart';
 
 class ShadRadioController<T> extends ValueNotifier<T?> {
@@ -410,52 +411,78 @@ class _ShadRadioState<T> extends State<ShadRadio<T>> {
             ),
           ),
         );
+        // Control centered against the primary label line.
+        final labelRow = Row(
+          textDirection: widget.direction,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: effectiveRadioPadding,
+              child: radio,
+            ),
+            if (widget.label != null)
+              Flexible(
+                child: Padding(
+                  padding: effectivePadding,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: DefaultTextStyle(
+                      style: theme.textTheme.muted.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: theme.colorScheme.foreground,
+                      ),
+                      child: widget.label!,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+
+        final Widget content;
+        if (widget.sublabel == null) {
+          content = labelRow;
+        } else {
+          content = Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              labelRow,
+              // Sublabel sits under the label, not the control: a SizedBox
+              // reserves the control's width so it aligns with the label start.
+              // Same muted/mutedForeground style as the checkbox sublabel.
+              Row(
+                textDirection: widget.direction,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(width: effectiveSize),
+                  Flexible(
+                    child: Padding(
+                      padding: effectivePadding,
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: DefaultTextStyle(
+                          style: theme.textTheme.muted.fallback(
+                            color: theme.colorScheme.mutedForeground,
+                          ),
+                          child: widget.sublabel!,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        }
+
         return ShadDisabled(
           showForbiddenCursor: true,
           disabled: !enabled,
           disabledOpacity: 1,
           child: GestureDetector(
             onTap: enabled ? onTap : null,
-            child: Row(
-              textDirection: widget.direction,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: effectiveRadioPadding,
-                  child: radio,
-                ),
-                if (widget.label != null)
-                  Flexible(
-                    child: Padding(
-                      padding: effectivePadding,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          MouseRegion(
-                            cursor: SystemMouseCursors.click,
-                            child: DefaultTextStyle(
-                              style: theme.textTheme.muted.copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: theme.colorScheme.foreground,
-                              ),
-                              child: widget.label!,
-                            ),
-                          ),
-                          if (widget.sublabel != null)
-                            MouseRegion(
-                              cursor: SystemMouseCursors.click,
-                              child: DefaultTextStyle(
-                                style: theme.textTheme.muted,
-                                child: widget.sublabel!,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+            child: content,
           ),
         );
       },

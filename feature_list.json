@@ -1,0 +1,42 @@
+{
+  "project": "atom-sn-flutter-shadcn-fork",
+  "note": "Work items for the fork. Exactly one item may be in_progress at a time. Statuses: pending | in_progress | done. Update together with PROGRESS.md.",
+  "features": [
+    {
+      "id": "upstream-sync-0.55.0",
+      "name": "Sync main/dev with upstream 0.55.0",
+      "description": "Mirror upstream nank1ro/flutter-shadcn-ui into main and dev at package version 0.55.0.",
+      "status": "done",
+      "dependencies": [],
+      "done_when": "main and dev contain upstream 0.55.0 and make check passes",
+      "evidence": "pubspec.yaml version: 0.55.0; dev c5ddeed merged to main via PR #4 (8ade01e)"
+    },
+    {
+      "id": "atomsn-pin-current",
+      "name": "atomsn pin points at usn branch tip",
+      "description": "Consumer atom-sn-flutter/packages/atomsn pins this repo at the tip of usn/0.54.0-elms-huge.",
+      "status": "done",
+      "dependencies": [],
+      "done_when": "pubspec ref SHA equals tip of the consumed usn/* branch",
+      "evidence": "ref 23ab87415af254933b8d760c74719582bf2829a3 == git log origin/usn/0.54.0-elms-huge -1 (verified 2026-07-08)"
+    },
+    {
+      "id": "agent-harness",
+      "name": "Agent harness (instructions, state, verification, scope, lifecycle)",
+      "description": "AGENTS.md workflow sections, feature_list.json, progress.md, init.sh, session-handoff.md; fix stale facts in the previous docs pass.",
+      "status": "in_progress",
+      "dependencies": [],
+      "done_when": "validate-harness score >= 70, init.sh runs green, PR to dev merged",
+      "evidence": "validate-harness 100/100 (2026-07-08); ./init.sh exit 0, flutter test +326 All tests passed!"
+    },
+    {
+      "id": "usn-recut-0.55.0",
+      "name": "Re-cut usn/* patch branch onto upstream 0.55.0",
+      "description": "usn/0.54.0-elms-huge is based on upstream 0.54.0 while main/dev are at 0.55.0. Replay the UScoreNow patches (default font family, time-picker fixes, checkbox/radio sublabel fixes) onto 0.55.0 as usn/0.55.0-elms-huge, then bump the atomsn pin to the new tip.",
+      "status": "pending",
+      "dependencies": ["upstream-sync-0.55.0", "agent-harness"],
+      "done_when": "new usn/0.55.0-elms-huge branch pushed, make check green on it, atomsn pubspec ref bumped to its tip and app verified",
+      "evidence": ""
+    }
+  ]
+}
